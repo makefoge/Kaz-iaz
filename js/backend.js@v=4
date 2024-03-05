@@ -1,0 +1,227 @@
+let Rubric = {
+    news: function () {
+        let btn = $('#last_news_list');
+        let link = $('input[name=last_news_list]');
+        btn.css('opacity', 0.5);
+        $.get(link[0].value, function (res) {
+            $('#rubric-last-news').append(res.render);
+            if (res.next) {
+                link.val(res.link);
+            } else {
+                btn.remove();
+            }
+            btn.css('opacity', 1);
+        });
+
+    },
+};
+let Search = {
+    load: function () {
+        let btn = $('#last_news_list');
+        let link = $('input[name=last_news_list]');
+        btn.css('opacity', 0.5);
+        $.get(link[0].value, function (res) {
+            $('#search-news').append(res.render);
+            if (res.next) {
+                link.val(res.link);
+            } else {
+                btn.remove();
+            }
+            btn.css('opacity', 1);
+        });
+    },
+};
+let Archive = {
+    load: function () {
+        let btn = $('#last_news_list');
+        let link = $('input[name=last_news_list]');
+        btn.css('opacity', 0.5);
+        $.get(link[0].value, function (res) {
+            $('#archive-news').append(res.render);
+            if (res.next) {
+                link.val(res.link);
+            } else {
+                btn.remove();
+            }
+            btn.css('opacity', 1);
+        });
+    },
+};
+let Comment = {
+    set_status: function (self) {
+        let form = $(self.parent().find('.--comment-form'));
+        if (form.data('display-toggle')) {
+            form.css('display', 'none');
+            form.data('display-toggle', 0);
+        } else {
+            form.css('display', 'block');
+            form.data('display-toggle', 1);
+        }
+    }, save: function () {
+        console.log();
+    },
+};
+let Author = {
+    news: function () {
+        let btn = $('#last_news_list');
+        let link = $('input[name=last_news_list]');
+        btn.css('opacity', 0.5);
+        $.get(link[0].value, function (res) {
+            $('#author-news').append(res.render);
+            if (res.next) {
+                link.val(res.link);
+            } else {
+                btn.remove();
+            }
+            btn.css('opacity', 1);
+        });
+
+    },
+};
+let Tag = {
+    news: function () {
+        let btn = $('#last_news_list');
+        let link = $('input[name=last_news_list]');
+        btn.css('opacity', 0.5);
+        $.get(link[0].value, function (res) {
+            $('#tag-news').append(res.render);
+            if (res.next) {
+                link.val(res.link);
+            } else {
+                btn.remove();
+            }
+            btn.css('opacity', 1);
+        });
+
+    },
+};
+
+let Columnist = {
+    news: function () {
+        let btn = $('#last_news_list');
+        let link = $('input[name=last_news_list]');
+        btn.css('opacity', 0.5);
+        $.get(link[0].value, function (res) {
+            $('#columnist-news').append(res.render);
+            if (res.next) {
+                link.val(res.link);
+            } else {
+                btn.remove();
+            }
+            btn.css('opacity', 1);
+        });
+
+    },
+};
+let Law = {
+    set_option_days: function (total) {
+        let option = '<option disabled selected>День</option>';
+        for (let i = 1; i <= total; i++) {
+            option += '<option value="' + i + '">' + i + '</option>';
+        }
+        $('#day').html(option);
+    }, date: {
+        y: undefined, m: undefined, d: undefined,
+    }, get_news() {
+        const url_params = new URLSearchParams(window.location.search);
+        const params = {
+            law_date: undefined, term: undefined,
+        };
+        let date = this.date.y;
+        if (this.date.m > 9) {
+            date += '-' + this.date.m;
+        } else {
+            date += '-0' + this.date.m;
+        }
+        if (this.date.d > 9) {
+            date += '-' + this.date.d;
+        } else {
+            date += '-0' + this.date.d;
+        }
+        params.law_date = date;
+        params.term = url_params.get('term');
+        let query_string = Object.entries(params).map(value => {
+            if (value[1]) {
+                return value[0] + '=' + value[1];
+            }
+        }).join('&');
+        window.location.href = '?' + query_string;
+    }, news: function () {
+        let btn = $('#last_news_list');
+        let link = $('input[name=last_news_list]');
+        btn.css('opacity', 0.5);
+        $.get(link[0].value, function (res) {
+            $('#rubric-last-news').append(res.render);
+            if (res.next) {
+                link.val(res.link);
+            } else {
+                btn.remove();
+            }
+            btn.css('opacity', 1);
+        });
+
+    },
+};
+
+$(document).ready(function () {
+    $('.--form').ajaxForm({
+        success: function (res) {
+            $('.--form textarea[name="content"]').val('');
+            alert(res.msg);
+        }, error: function (err) {
+            alert(err.responseJSON.msg);
+        },
+    });
+
+    $('#sort').change(function () {
+        window.location.href = $(this)[0].value;
+    });
+    $('#year').change(function () {
+        Law.date.y = $('#year').val();
+        console.log(Law.date);
+        if (Law.date.y && Law.date.m && Law.date.d) {
+            Law.get_news();
+        }
+    });
+    $('#month').change(function () {
+        let year = $('#year').val();
+        let month = $('#month').val();
+        if (year) {
+            let days = new Date(year, month, 0).getDate();
+            Law.set_option_days(days);
+            Law.date.d = undefined;
+        }
+        Law.date.m = month;
+
+        if (Law.date.y && Law.date.m && Law.date.d) {
+            Law.get_news();
+        }
+    });
+    $('#day').change(function () {
+        Law.date.d = $(this).val();
+        if (Law.date.y && Law.date.m && Law.date.d) {
+            Law.get_news();
+        }
+    });
+    //выбираем по умолчанию
+    const url_params = new URLSearchParams(window.location.search);
+    if (url_params.get('law_date')) {
+        const date_split = url_params.get('law_date').split('-');
+        const [year, month, date] = [
+            parseInt(date_split[0]),
+            parseInt(date_split[1]),
+            parseInt(date_split[2])];
+        let days = new Date(year, month, 0).getDate();
+        Law.set_option_days(days);
+        $('#year').val(year);
+        $('#month').val(month);
+        $('#day').val(date);
+        Law.date.y = year;
+        Law.date.m = month;
+        Law.date.d = date;
+    }
+});
+
+$(function () {
+    $('.lazy').lazy();
+});
